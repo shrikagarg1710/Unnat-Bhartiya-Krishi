@@ -203,7 +203,7 @@ def render_documents(files, session_uploads: set):
             st.html(f"""
                 <div style="
                     position:relative; overflow:visible; border-radius:14px;
-                    padding:18px 20px; min-height:155px; display:flex;
+                    padding:18px 20px; min-height:11.7rem; display:flex;
                     flex-direction:column; justify-content:space-between;
                     gap:14px; background:{card_bg}; border:1px solid {card_border};
                     box-shadow:0 4px 16px {card_shadow};
@@ -242,7 +242,11 @@ def render_documents(files, session_uploads: set):
 
 
 st.space("small")
-st.markdown(f"### 📚 {st.session_state.config['admin_ks_title']} ({st.session_state.config['admin_total_chunks'].format(no_of_chunks=get_total_chunks())})")
+st.markdown(f"### 📚 {st.session_state.config['admin_ks_title']}""")
+if not all_uploaded_files:
+    st.markdown(f"{st.session_state.config['admin_no_files_present']}")
+else:
+    st.markdown(f"{st.session_state.config['admin_total_files_and_chunks'].format(no_of_files=len(all_uploaded_files), no_of_chunks=get_total_chunks())}")
 
 if not all_uploaded_files:
     st.html(
