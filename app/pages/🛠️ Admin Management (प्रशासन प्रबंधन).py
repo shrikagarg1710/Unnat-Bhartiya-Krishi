@@ -1,3 +1,4 @@
+import os
 import time
 import streamlit as st
 import base64
@@ -8,7 +9,7 @@ from utils.s3_handler import S3Handler
 from utils.vectorstore_handler import vectorize_and_store
 
 load_header("admin", "🛠️")
-s3_handler = S3Handler("ubk-documents")
+s3_handler = S3Handler(os.environ.get("AWS_BUCKET_NAME"))
 
 
 @st.cache_data(ttl=60)

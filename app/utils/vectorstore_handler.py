@@ -105,8 +105,6 @@ def similarity_search(query: str, top_k: int = 5) -> List[dict]:
     query_vec = _embed([query])
     scores, indices = index.search(query_vec, top_k)
 
-    st.write(scores)
-
     results = []
 
     for i, idx in enumerate(indices[0]):

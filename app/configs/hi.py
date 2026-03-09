@@ -35,5 +35,14 @@ hi_config = {
     "admin_chunks_success": "{chunks} भागों को संसाधित करके खोज के लिए संग्रहित किया गया!",
     "admin_ks_title": "ज्ञान स्रोत",
     "admin_ndocs_message": "अभी तक कोई दस्तावेज़ नहीं",
-    "admin_ndocs_subtitle": "अपने ज्ञान आधार को भरने के लिए ऊपर PDF या DOCX अपलोड करें"
+    "admin_ndocs_subtitle": "अपने ज्ञान आधार को भरने के लिए ऊपर PDF या DOCX अपलोड करें",
+    "farmer_portal_label": "अपना खेती से जुड़ा सवाल यहाँ पूछें",
+    "farmer_portal_placeholder": "प्रधानमंत्री किसान सम्मान निधि क्या है?",
+    "farmer_portal_ask_button": "पूछें",
+    "farmer_portal_answer_label": "उत्तर:",
+    "farmer_portal_supporting_docs": "संबंधित जानकारी (शीर्ष {no_of_chunks} भाग)",
+    "farmer_portal_searching": "कृषि जानकारी खोजी जा रही है...",
+    "farmer_portal_no_doc_error": "कोई संबंधित जानकारी नहीं मिली। कृपया दूसरा सवाल पूछें या दस्तावेज़ अपलोड करें।",
+    "farmer_portal_generating_answer": "उत्तर तैयार किया जा रहा है...",
+    "farmer_portal_chunk": "भाग"
 }
