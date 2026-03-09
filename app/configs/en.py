@@ -35,5 +35,18 @@ en_config = {
     "admin_chunks_success": "{chunks} parts processed and stored for search!",
     "admin_ks_title": "Knowledge Sources",
     "admin_ndocs_message": "No documents yet",
-    "admin_ndocs_subtitle": "Upload a PDF or DOCX above to populate your knowledge base"
+    "admin_ndocs_subtitle": "Upload a PDF or DOCX above to populate your knowledge base",
+    "admin_files_deleted": "File deleted successfully.",
+    "admin_chunks_cleared": "Vector data cleared.",
+    "admin_deleted_button": "Delete",
+    "admin_total_chunks": "Total {no_of_chunks} parts",
+    "farmer_portal_label": "Ask your farming question",
+    "farmer_portal_placeholder": "What is PM-KISAN?",
+    "farmer_portal_ask_button": "Ask",
+    "farmer_portal_answer_label": "Answer:",
+    "farmer_portal_supporting_docs": "Related Information (Top {no_of_chunks} Parts)",
+    "farmer_portal_searching": "Searching farming information...",
+    "farmer_portal_no_doc_error": "No relevant information found. Please try another question or upload documents.",
+    "farmer_portal_generating_answer": "Preparing answer...",
+    "farmer_portal_chunk": "Chunk"
 }

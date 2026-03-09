@@ -1,3 +1,4 @@
+import os
 import time
 import streamlit as st
 import base64
@@ -5,10 +6,10 @@ from pathlib import Path
 
 from common.pages_header import load_header
 from utils.s3_handler import S3Handler
-from utils.vectorstore_handler import vectorize_and_store
+from utils.vectorstore_handler import get_total_chunks, vectorize_and_store, delete_chunks_by_filename
 
 load_header("admin", "🛠️")
-s3_handler = S3Handler("ubk-documents")
+s3_handler = S3Handler(os.environ.get("AWS_BUCKET_NAME"))
 
 
 @st.cache_data(ttl=60)
@@ -32,15 +33,39 @@ if "session_uploads" not in st.session_state:
 if "chunks_added" not in st.session_state:
     st.session_state.chunks_added = 0
 
+if "pending_delete" not in st.session_state:
+    st.session_state.pending_delete = None
+
+if "delete_success" not in st.session_state:
+    st.session_state.delete_success = False
+
 # --- Toast on success then rerun ---
 if st.session_state.upload_success:
     st.session_state.upload_success = False
     chunks = st.session_state.chunks_added
     st.toast(st.session_state.config["admin_file_uploaded_success"], icon="✅")
-    st.toast(
-        st.session_state.config["admin_chunks_success"].format(chunks=chunks), icon="✅"
-    )
+    st.toast(st.session_state.config["admin_chunks_success"].format(chunks=chunks), icon="✅")
     time.sleep(2)
+    st.rerun()
+
+# --- After existing toast block, add delete toast ---
+if st.session_state.delete_success:
+    st.session_state.delete_success = False
+    st.toast(st.session_state.config['admin_files_deleted'], icon="🗑️")
+    st.toast(st.session_state.config['admin_chunks_cleared'], icon="🧹")
+    time.sleep(1)
+    st.rerun()
+
+# --- Handle confirmed delete ---
+if st.session_state.pending_delete:
+    filename = st.session_state.pending_delete
+    ok = s3_handler.delete_file(filename)
+    if ok:
+        chunks_removed = delete_chunks_by_filename(filename)
+        st.session_state.session_uploads.discard(filename)
+        st.session_state.delete_success = True
+    st.session_state.pending_delete = None
+    get_all_files.clear()
     st.rerun()
 
 is_locked = st.session_state.is_uploading
@@ -139,8 +164,6 @@ def load_icon(icon_path: Path) -> str:
 
 
 def render_documents(files, session_uploads: set):
-    is_dark = True
-
     card_bg = "#1e1e2a"
     card_border = "#2a2a3a"
     card_shadow = "rgba(0,0,0,0.4)"
@@ -158,81 +181,67 @@ def render_documents(files, session_uploads: set):
             icon_path = PDF_ICON if file["ext"].lower() == "pdf" else DOCX_ICON
             icon_src = load_icon(icon_path)
             display_name = file["filename"]
-
             is_new = file["filename"] in session_uploads
+
             new_badge = (
-                f"""
-                <div style="
-                    position: absolute;
-                    overflow: visible;
-                    top: -10px;
-                    right: -10px;
-                    background: linear-gradient(135deg, #22c55e, #16a34a);
-                    color: white;
-                    font-size: 9px;
-                    font-weight: 800;
-                    letter-spacing: 1.2px;
-                    padding: 3px 8px;
-                    border-radius: 20px;
-                    text-transform: uppercase;
-                    box-shadow: 0 2px 6px rgba(34,197,94,0.4);
-                    z-index: 10;
-                ">{st.session_state.config['admin_new']}</div>
-            """
-                if is_new
-                else ""
+                f"""<div style="
+                    position:absolute; top:-10px; right:-10px;
+                    background:linear-gradient(135deg,#22c55e,#16a34a);
+                    color:white; font-size:9px; font-weight:800;
+                    letter-spacing:1.2px; padding:3px 8px; border-radius:20px;
+                    text-transform:uppercase; box-shadow:0 2px 6px rgba(34,197,94,0.4);
+                    z-index:10;
+                ">{st.session_state.config['admin_new']}</div>"""
+                if is_new else ""
             )
 
-            st.html(
-                f"""
+            st.html(f"""
                 <div style="
-                    position:relative;
-                    overflow:visible;
-                    border-radius:14px;
-                    padding:18px 20px;
-                    min-height:155px;
-                    display:flex;
-                    flex-direction:column;
-                    justify-content:space-between;
-                    gap:14px;
-                    background:{card_bg};
-                    border:1px solid {card_border};
+                    position:relative; overflow:visible; border-radius:14px;
+                    padding:18px 20px; min-height:155px; display:flex;
+                    flex-direction:column; justify-content:space-between;
+                    gap:14px; background:{card_bg}; border:1px solid {card_border};
                     box-shadow:0 4px 16px {card_shadow};
                 ">
                     {new_badge}
-
                     <div style="display:flex;gap:12px;align-items:flex-start;">
                         <img src="{icon_src}" style="width:28px;height:32px;flex-shrink:0;" />
                         <span style="
-                            font-size:13px; font-weight:600;
-                            color:{text_color};
-                            line-height:1.45;
-                            word-break:break-word;
-                            overflow-wrap:break-word;
-                            padding-right:36px;
+                            font-size:13px; font-weight:600; color:{text_color};
+                            line-height:1.45; word-break:break-word;
+                            overflow-wrap:break-word; padding-right:36px;
                         ">{display_name}</span>
                     </div>
-
                     <div style="
                         display:flex; justify-content:space-between;
-                        align-items:center; font-size:12px;
-                        color:{meta_color};
+                        align-items:center; font-size:12px; color:{meta_color};
                     ">
                         <span>{file["size_kb"]} KB</span>
                         <span style="
-                            background:{badge_bg};
-                            color:{badge_color};
+                            background:{badge_bg}; color:{badge_color};
                             padding:3px 10px; border-radius:8px;
                             font-weight:600; font-size:11px; letter-spacing:0.5px;
                         ">{file["ext"]}</span>
                     </div>
                 </div>
-                """
-            )
+            """)
+
+            # Delete button sits below the card, styled subtly
+            if st.button(
+                f"🗑️ {st.session_state.config['admin_deleted_button']}",
+                key=f"delete_{file['filename']}_{i}",
+                use_container_width=True,
+            ):
+                st.session_state.pending_delete = file["filename"]
+                st.rerun()
 
 
 st.space("small")
-st.markdown(f"### 📚 {st.session_state.config["admin_ks_title"]}")
+st.markdown(f"### 📚 {st.session_state.config['admin_ks_title']} ({st.session_state.config['admin_total_chunks'].format(no_of_chunks=get_total_chunks())})")
+
+# show how many chunks present in the faiss
+
+
 if not all_uploaded_files:
     st.html(
         f"""

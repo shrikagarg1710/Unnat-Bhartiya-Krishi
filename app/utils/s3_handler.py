@@ -50,3 +50,12 @@ class S3Handler:
         except Exception as e:
             print(f"Error listing files: {e}")
             return []
+    
+    def delete_file(self, filename: str) -> bool:
+        """Delete a file from S3 by filename."""
+        try:
+            self.s3_client.delete_object(Bucket=self.bucket_name, Key=filename)
+            return True
+        except Exception as e:
+            print(f"Error deleting from S3: {e}")
+            return False
