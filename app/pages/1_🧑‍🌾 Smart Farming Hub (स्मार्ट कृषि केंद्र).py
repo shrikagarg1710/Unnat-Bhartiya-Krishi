@@ -1,9 +1,13 @@
 import streamlit as st
+from dotenv import load_dotenv
+
 from common.pages_header import load_header
 from utils.vectorstore_handler import similarity_search
 from utils.llm_handler import generate_answer
 
 load_header("farmers_portal", "🧑‍🌾")
+
+load_dotenv()
 
 query = st.text_input(
     label=st.session_state.config["farmer_portal_label"], placeholder=st.session_state.config["farmer_portal_placeholder"]
