@@ -8,7 +8,6 @@
 The AI Farmer Assistant is an intelligent decision-support system designed to help farmers make informed agricultural decisions using combination of Artificial Intelligence (AI) and Generative AI (GenAI).
 
 The platform enables farmers to:
-
 - Receive **crop recommendations** based on soil and weather conditions
 - Ask questions about **ongoing government agricultural schemes**
 - Access **agricultural knowledge in their native language**

@@ -1,0 +1,8 @@
+streamlit
+streamlit-local-storage
+boto3
+python-dotenv
+faiss-cpu
+sentence-transformers
+pdfplumber
+python-docx
