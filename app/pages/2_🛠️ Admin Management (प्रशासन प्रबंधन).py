@@ -51,8 +51,8 @@ if st.session_state.upload_success:
 # --- After existing toast block, add delete toast ---
 if st.session_state.delete_success:
     st.session_state.delete_success = False
-    st.toast(st.session_state.config.get("admin_file_deleted_success", "File deleted."), icon="🗑️")
-    st.toast(f"Cleared chunks from vector store.", icon="🧹")
+    st.toast(st.session_state.config['admin_files_deleted'], icon="🗑️")
+    st.toast(st.session_state.config['admin_chunks_cleared'], icon="🧹")
     time.sleep(1)
     st.rerun()
 
@@ -228,7 +228,7 @@ def render_documents(files, session_uploads: set):
 
             # Delete button sits below the card, styled subtly
             if st.button(
-                "🗑️ Delete",
+                f"🗑️ {st.session_state.config['admin_deleted_button']}",
                 key=f"delete_{file['filename']}_{i}",
                 use_container_width=True,
             ):
@@ -237,7 +237,7 @@ def render_documents(files, session_uploads: set):
 
 
 st.space("small")
-st.markdown(f"### 📚 {st.session_state.config["admin_ks_title"]} (Total {get_total_chunks()} chunks)")
+st.markdown(f"### 📚 {st.session_state.config['admin_ks_title']} ({st.session_state.config['admin_total_chunks'].format(no_of_chunks=get_total_chunks())})")
 
 # show how many chunks present in the faiss
 
