@@ -6,7 +6,7 @@ from pathlib import Path
 
 from common.pages_header import load_header
 from utils.s3_handler import S3Handler
-from utils.vectorstore_handler import vectorize_and_store
+from utils.vectorstore_handler import get_total_chunks, vectorize_and_store
 
 load_header("admin", "🛠️")
 s3_handler = S3Handler(os.environ.get("AWS_BUCKET_NAME"))
@@ -233,7 +233,11 @@ def render_documents(files, session_uploads: set):
 
 
 st.space("small")
-st.markdown(f"### 📚 {st.session_state.config["admin_ks_title"]}")
+st.markdown(f"### 📚 {st.session_state.config["admin_ks_title"]} (Total {get_total_chunks()} chunks)")
+
+# show how many chunks present in the faiss
+
+
 if not all_uploaded_files:
     st.html(
         f"""

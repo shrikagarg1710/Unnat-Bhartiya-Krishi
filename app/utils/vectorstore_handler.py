@@ -74,6 +74,11 @@ def _load_store():
     return index, metadata
 
 
+def get_total_chunks():
+    index, _ = _load_store()
+    return index.ntotal
+
+
 def vectorize_and_store(file_bytes: bytes, filename: str) -> int:
     """Extract → chunk → embed locally → save to FAISS. Returns chunks added."""
     text = _extract_text(file_bytes, filename)
